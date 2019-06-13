@@ -36,7 +36,7 @@ def callback():
 def handle_message(event):
     try:
         message = TextSendMessage(text=event.message.text)
-        btn = {
+        quick_reply = {
 				"type": "text",
 				"text": "Select your favorite food category or send me your location!",
 				"quickReply": {
@@ -68,10 +68,13 @@ def handle_message(event):
 				}
 			}
         line_bot_api.reply_message(event.reply_token, message)
-        line_bot_api.reply_message(event.reply_token, btn)
-    except:
+        line_bot_api.reply_message(event.reply_token, quick_reply)
+        image_url = "https://yumetwins.cdn.prismic.io/yumetwins/df97f2deda4e833a45247d07c15b0c136a57937e_465804506659e4c3d02445c894cf5bf8fdadc08a_gu_announcement_01.png"
+        message = ImageSendMessage(original_content_url=image_url, preview_image_url=image_url)
+    except LineBotApiError as e:
         message = TextSendMessage(text=type(event.message.text))
         line_bot_api.reply_message(event.reply_token, message)
+        raise e
 
 import os
 if __name__ == "__main__":
