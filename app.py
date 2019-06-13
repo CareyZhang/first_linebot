@@ -37,6 +37,7 @@ def handle_message(event):
     try:
         message = TextSendMessage(text=event.message.text)
         print(type(event))
+        print(type(event.message))
         line_bot_api.reply_message(event.reply_token, message)
     except:
         message = TextSendMessage(text=type(event.message.text))
