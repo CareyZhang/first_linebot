@@ -34,13 +34,12 @@ def callback():
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    #message = TextSendMessage(text=event.message.text)
-    if event.message.text == 'a':
-        msg = '1'
-    elif event.message.text == 'b':
-        msg = '2'
-    message = TextSendMessage(text=msg)
-    line_bot_api.reply_message(event.reply_token, message)
+    try:
+        message = TextSendMessage(text=type(event.message.text))
+        line_bot_api.reply_message(event.reply_token, message)
+    except:
+        message = TextSendMessage(text=type(event.message.text))
+        line_bot_api.reply_message(event.reply_token, message)
 
 import os
 if __name__ == "__main__":
