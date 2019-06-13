@@ -36,9 +36,41 @@ def callback():
 def handle_message(event):
     try:
         message = TextSendMessage(text=event.message.text)
-        print(type(event))
-        print(type(event.message))
+        btn = {
+				"type": "text",
+				"text": "Select your favorite food category or send me your location!",
+				"quickReply": {
+					"items": [
+						{
+							"type": "action",
+							"imageUrl": "https://example.com/sushi.png",
+							"action": {
+										"type": "message",
+										"label": "Sushi",
+										"text": "Sushi"
+							}
+						},
+						{
+							"type": "action",
+							"imageUrl": "https://example.com/tempura.png",
+							"action": {
+										"type": "message",
+										"label": "Tempura",
+										"text": "Tempura"
+							}
+						},
+						{
+							"type": "action",
+							"action": {
+										"type": "location",
+										"label": "Send location"
+							}
+						}
+					]
+				}
+			}
         line_bot_api.reply_message(event.reply_token, message)
+        line_bot_api.reply_message(event.reply_token, btn)
     except:
         message = TextSendMessage(text=type(event.message.text))
         line_bot_api.reply_message(event.reply_token, message)
