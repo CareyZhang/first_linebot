@@ -43,7 +43,6 @@ def handle_message(event):
 					"items": [
 						{
 							"type": "action",
-							"imageUrl": "https://example.com/sushi.png",
 							"action": {
 										"type": "message",
 										"label": "Sushi",
@@ -52,7 +51,6 @@ def handle_message(event):
 						},
 						{
 							"type": "action",
-							"imageUrl": "https://example.com/tempura.png",
 							"action": {
 										"type": "message",
 										"label": "Tempura",
