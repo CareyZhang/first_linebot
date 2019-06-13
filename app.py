@@ -1,3 +1,4 @@
+import json
 from flask import Flask, request, abort
 
 from linebot import (
@@ -33,7 +34,8 @@ def callback():
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    message = TextSendMessage(text="Hello world")
+	print(event)
+    message = TextSendMessage(text=json.dumps(event.message.text))
     line_bot_api.reply_message(event.reply_token, message)
 
 import os
