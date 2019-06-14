@@ -10,7 +10,7 @@ from linebot import (
     LineBotApi, WebhookHandler
 )
 from linebot.exceptions import (
-    InvalidSignatureError,LineBotApi,Error
+    InvalidSignatureError
 )
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
