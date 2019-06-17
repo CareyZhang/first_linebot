@@ -117,7 +117,7 @@ def handle_message(event):
                     content = "".join(item + " : " + str(index) + "\n" for index,item in data_index)
                     message = TextSendMessage(text=content)
                     line_bot_api.reply_message(event.reply_token, message)
-                else if len(cmd)==3:
+                elif len(cmd)==3:
                     pass
                 else:
                     pass
