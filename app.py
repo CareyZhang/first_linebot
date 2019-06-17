@@ -65,12 +65,13 @@ def get_exchange_rate_info():
     res = rs.get(target_url,headers=headers)
     res.encoding = 'utf-8'
     soup = BeautifulSoup(res.text, 'html.parser')
+    current_time = soup.find("span",{"class":"time"}).text
     currcency = soup.find_all("div",{"class":"hidden-phone print_show"})
     cash_in = soup.find_all("td",{"class":"rate-content-cash text-right print_hide","data-table":"本行現金買入"})
     cash_out = soup.find_all("td",{"class":"rate-content-cash text-right print_hide","data-table":"本行現金賣出"})
     spot_in = soup.find_all("td",{"class":"text-right display_none_print_show print_width","data-table":"本行即期買入"})
     spot_out = soup.find_all("td",{"class":"text-right display_none_print_show print_width","data-table":"本行即期賣出"})
-    return {"currcency":currcency,"cash_in":cash_in,"cash_out":cash_out,"spot_in":spot_in,"spot_out":spot_out}
+    return {"time":current_time,"currcency":currcency,"cash_in":cash_in,"cash_out":cash_out,"spot_in":spot_in,"spot_out":spot_out}
             
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
@@ -120,7 +121,7 @@ def handle_message(event):
                 elif len(cmd)==3:
                     ind = int(cmd[2])
                     rate = {"currcency":re.split("\r\n",data["currcency"][ind].text)[1].strip(),"cash_in":data["cash_in"][ind].text,"cash_out":data["cash_out"][ind].text,"spot_in":data["spot_in"][ind].text,"spot_out":data["spot_out"][ind].text}
-                    content=rate["currcency"] + "\n現金\n" + "買入 : " + rate["cash_in"] + "\n賣出 : " + rate["cash_out"] + "\n即期\n" + "買入 : " + rate["spot_in"] + "\n賣出 : " + rate["spot_out"]
+                    content = rate["time"] + "\n" + rate["currcency"] + "\n現金\n" + "買入 : " + rate["cash_in"] + "\n賣出 : " + rate["cash_out"] + "\n即期\n" + "買入 : " + rate["spot_in"] + "\n賣出 : " + rate["spot_out"]
                     message = TextSendMessage(text=content)
                     line_bot_api.reply_message(event.reply_token, message)
                 else:
