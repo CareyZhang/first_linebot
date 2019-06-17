@@ -112,9 +112,9 @@ def handle_message(event):
                 line_bot_api.reply_message(event.reply_token, message)
             elif cmd[1] == "rate":
                 data = get_exchange_rate_info()
-                data_index = enumerate(data["currcency"]) 
+                data_index = enumerate([re.split("\r\n",item.text)[1].strip() for index,item in enumerate(data["currcency"])])
                 if len(cmd)==2:
-                    content = "".join(re.split("\r\n",item.text)[1].strip() + " : " + str(index + "\n" for index,item in data_index)
+                    content = "".join(item + " : " + str(index) + "\n" for index,item in data_index)
                     message = TextSendMessage(text=content)
                     line_bot_api.reply_message(event.reply_token, message)
                 else if len(cmd)==3:
