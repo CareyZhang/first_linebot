@@ -101,24 +101,35 @@ def handle_postback(event):
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     try:
-        if event.message.text == "/help":
-            content="查詢匯率 : /ex_rate\n"
-            message = TextSendMessage(text=content)
-            line_bot_api.reply_message(event.reply_token, message)
-        elif event.message.text == "/ex_rate":
-            data = get_exchange_rate_info()
-            data_index = enumerate(data["currcency"])
-            #rate = {"currcency":re.split("\r\n",data["currcency"][currcency_id].text)[1].strip(),"cash_in":data["cash_in"][currcency_id].text,"cash_out":data["cash_out"][currcency_id].text,"spot_in":data["spot_in"][currcency_id].text,"spot_out":data["spot_out"][currcency_id].text}
-            message = TextSendMessage(text='Choose an exchange rate to search.',quick_reply=QuickReply(items=[QuickReplyButton(action=PostbackAction(label=index, data=re.split("\r\n",item.text)[1].strip())) for index,item in data_index]))
-            line_bot_api.reply_message(event.reply_token, message)
-        else:
+        cmd =re.split("/",event.message.text)
+        if cmd[0] == "":
             message = TextSendMessage(text=event.message.text)
             line_bot_api.reply_message(event.reply_token, message)
-        """
-        image_url = "https://yumetwins.cdn.prismic.io/yumetwins/df97f2deda4e833a45247d07c15b0c136a57937e_465804506659e4c3d02445c894cf5bf8fdadc08a_gu_announcement_01.png"
-        img = ImageSendMessage(original_content_url=image_url, preview_image_url=image_url)
-        line_bot_api.reply_message(event.reply_token,img)
-        """
+        else:
+            if cmd[1] == "help":
+                content="查詢幣別 : /rate\n查詢匯率 : /rate/幣別ID\n"
+                message = TextSendMessage(text=content)
+                line_bot_api.reply_message(event.reply_token, message)
+            elif cmd[1] == "rate":
+                data = get_exchange_rate_info()
+                data_index = enumerate(data["currcency"]) 
+                if len(cmd)==2:
+                    content = "".join(re.split("\r\n",item.text)[1].strip() + " : " + str(index + "\n" for index,item in data_index)
+                    message = TextSendMessage(text=content)
+                    line_bot_api.reply_message(event.reply_token, message)
+                else if len(cmd)==3:
+                    pass
+                else:
+                    pass
+                #rate = {"currcency":re.split("\r\n",data["currcency"][currcency_id].text)[1].strip(),"cash_in":data["cash_in"][currcency_id].text,"cash_out":data["cash_out"][currcency_id].text,"spot_in":data["spot_in"][currcency_id].text,"spot_out":data["spot_out"][currcency_id].text}
+            else:
+                message = TextSendMessage(text="Command not exist.")
+                line_bot_api.reply_message(event.reply_token, message)
+            """
+            image_url = "https://yumetwins.cdn.prismic.io/yumetwins/df97f2deda4e833a45247d07c15b0c136a57937e_465804506659e4c3d02445c894cf5bf8fdadc08a_gu_announcement_01.png"
+            img = ImageSendMessage(original_content_url=image_url, preview_image_url=image_url)
+            line_bot_api.reply_message(event.reply_token,img)
+            """
     except LineBotApiError as e:
         raise e
 
