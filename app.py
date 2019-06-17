@@ -102,7 +102,7 @@ def handle_postback(event):
 def handle_message(event):
     try:
         cmd =re.split("/",event.message.text)
-        if cmd[0] == "":
+        if cmd[0] != "":
             message = TextSendMessage(text=event.message.text)
             line_bot_api.reply_message(event.reply_token, message)
         else:
