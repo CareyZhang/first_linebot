@@ -111,8 +111,9 @@ def handle_message(event):
                )
 		   ]))
            line_bot_api.reply_message(event.reply_token, message)
-        elif event.message.text == ""
-           line_bot_api.reply_message(event.reply_token, message)
+        else:
+            message = TextSendMessage(text=event.message.text)
+            line_bot_api.reply_message(event.reply_token, message)
         """
         image_url = "https://yumetwins.cdn.prismic.io/yumetwins/df97f2deda4e833a45247d07c15b0c136a57937e_465804506659e4c3d02445c894cf5bf8fdadc08a_gu_announcement_01.png"
         img = ImageSendMessage(original_content_url=image_url, preview_image_url=image_url)
