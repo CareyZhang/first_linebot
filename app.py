@@ -110,7 +110,7 @@ def handle_message(event):
             data_index = enumerate(data["currcency"])
             rate = {"currcency":re.split("\r\n",data["currcency"][currcency_id].text)[1].strip(),"cash_in":data["cash_in"][currcency_id].text,"cash_out":data["cash_out"][currcency_id].text,"spot_in":data["spot_in"][currcency_id].text,"spot_out":data["spot_out"][currcency_id].text}
             message = TextSendMessage(text='Choose an exchange rate to search.',quick_reply=QuickReply(items=[
-		        QuickReplyButton(
+                QuickReplyButton(
                     action=PostbackAction(label=index, data=item)
                 ) for index,item in data_index]
             ))
