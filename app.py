@@ -58,7 +58,7 @@ def make_static_tmp_dir():
         else:
             raise
 
-def get_exchange_rate(currcency_id):
+def get_exchange_rate_info():
     target_url = 'https://rate.bot.com.tw/xrt?Lang=zh-TW'
     headers={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"}
     rs = requests.session()
@@ -70,7 +70,7 @@ def get_exchange_rate(currcency_id):
     cash_out = soup.find_all("td",{"class":"rate-content-cash text-right print_hide","data-table":"本行現金賣出"})
     spot_in = soup.find_all("td",{"class":"text-right display_none_print_show print_width","data-table":"本行即期買入"})
     spot_out = soup.find_all("td",{"class":"text-right display_none_print_show print_width","data-table":"本行即期賣出"})
-    return {"currcency":re.split("\r\n",currcency[currcency_id].text)[1].strip(),"cash_in":cash_in[currcency_id].text,"cash_out":cash_out[currcency_id].text,"spot_in":spot_in[currcency_id].text,"spot_out":spot_out[currcency_id].text}
+    return {"currcency":currcency,"cash_in":cash_in,"cash_out":cash_out,"spot_in":spot_in,"spot_out":spot_out}
             
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
@@ -104,12 +104,16 @@ def handle_message(event):
         if event.message.text == "/help":
             content="查詢匯率 : /ex_rate\n"
             message = TextSendMessage(text=content)
+            line_bot_api.reply_message(event.reply_token, message)
         elif event.message.text == "/ex_rate":
-           message = TextSendMessage(text='Choose an exchange rate to search.',quick_reply=QuickReply(items=[
-		       QuickReplyButton(
-                   action=PostbackAction(label="ex_rate", data="1")
-               )
-		   ]))
+            data = get_exchange_rate_info()
+            data_index = enumerate(data["currcency"])
+            rate = {"currcency":re.split("\r\n",data["currcency"][currcency_id].text)[1].strip(),"cash_in":data["cash_in"][currcency_id].text,"cash_out":data["cash_out"][currcency_id].text,"spot_in":data["spot_in"][currcency_id].text,"spot_out":data["spot_out"][currcency_id].text}
+            message = TextSendMessage(text='Choose an exchange rate to search.',quick_reply=QuickReply(items=[
+		        QuickReplyButton(
+                    action=PostbackAction(label=index, data=item)
+                )
+		   ] for index,item in data_index))
            line_bot_api.reply_message(event.reply_token, message)
         else:
             message = TextSendMessage(text=event.message.text)
