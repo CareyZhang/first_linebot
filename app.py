@@ -1,8 +1,12 @@
 import os
+import re
 import sys
 import errno
 import json
 import tempfile
+import requests 
+from bs4 import BeautifulSoup
+from urllib.request import urlretrieve
 
 from flask import Flask, request, abort, send_from_directory
 
@@ -54,6 +58,20 @@ def make_static_tmp_dir():
         else:
             raise
 
+def get_exchange_rate(currcency_id):
+    target_url = 'https://rate.bot.com.tw/xrt?Lang=zh-TW'
+    headers={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"}
+    rs = requests.session()
+    res = rs.get(target_url,headers=headers)
+    res.encoding = 'utf-8'
+    soup = BeautifulSoup(res.text, 'html.parser')
+    currcency = soup.find_all("div",{"class":"hidden-phone print_show"})
+    cash_in = soup.find_all("td",{"class":"rate-content-cash text-right print_hide","data-table":"本行現金買入"})
+    cash_out = soup.find_all("td",{"class":"rate-content-cash text-right print_hide","data-table":"本行現金賣出"})
+    spot_in = soup.find_all("td",{"class":"text-right display_none_print_show print_width","data-table":"本行即期買入"})
+    spot_out = soup.find_all("td",{"class":"text-right display_none_print_show print_width","data-table":"本行即期賣出"})
+    return {"currcency":re.split("\r\n",currcency[currcency_id].text)[1].strip(),"cash_in":cash_in[currcency_id].text,"cash_out":cash_out[currcency_id].text,"spot_in":spot_in[currcency_id].text,"spot_out":spot_out[currcency_id].text}
+            
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -72,11 +90,29 @@ def callback():
     return 'OK'
 
 # 處理訊息
+@handler.add(PostbackEvent)
+def handle_postback(event):
+    if event.postback.data == 'ex_rate':
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text='ex_rate'))
+    else:
+        pass
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     try:
-        message = TextSendMessage(text=event.message.text)
-        line_bot_api.reply_message(event.reply_token, message)
+        if event.message.text == "/help":
+            content="查詢匯率 : /ex_rate\n"
+            message = TextSendMessage(text=content)
+        elif event.message.text == "/ex_rate":
+           message = TextSendMessage(text='Choose an exchange rate to search.',quick_reply=QuickReply(items=[
+		       QuickReplyButton(
+                   action=PostbackAction(label="ex_rate", data="1")
+               )
+		   ]))
+           line_bot_api.reply_message(event.reply_token, message)
+        elif event.message.text == ""
+           line_bot_api.reply_message(event.reply_token, message)
         """
         image_url = "https://yumetwins.cdn.prismic.io/yumetwins/df97f2deda4e833a45247d07c15b0c136a57937e_465804506659e4c3d02445c894cf5bf8fdadc08a_gu_announcement_01.png"
         img = ImageSendMessage(original_content_url=image_url, preview_image_url=image_url)
